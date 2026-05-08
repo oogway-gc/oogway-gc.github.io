@@ -4,363 +4,598 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OOGWAY</title>
-    <!-- Light & Dark Mode Variable Definitions -->
+    <!-- Basic resets, specific theme variables are handled by ECElements -->
     <style>
-        :root {
-            --bg-main: #f0f2f5;
-            --bg-card: #ffffff;
-            --text-main: #050505;
-            --text-sec: #65676B;
-            --border: #ced0d4;
-            --primary: #1877f2;
-            --primary-hover: #166fe5;
-        }
-        body.dark {
-            --bg-main: #18191a;
-            --bg-card: #242526;
-            --text-main: #e4e6eb;
-            --text-sec: #b0b3b8;
-            --border: #3e4042;
-            --primary: #2d88ff;
-            --primary-hover: #1877f2;
-        }
-        body { margin: 0; padding: 0; overflow: hidden; transition: 0.3s background; }
-        
-        /* Hide scrollbars for cleaner UI but allow scrolling */
+        body { margin: 0; padding: 0; overflow: hidden; background: var(--ec-bg, #f0f2f5); transition: background 0.3s; }
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--ec-border, #ced0d4); border-radius: 4px; }
+        .chat-bubble { padding: 10px; border-radius: 12px; margin-bottom: 8px; max-width: 80%; width: fit-content; }
+        .chat-mine { background: var(--ec-accent, #1a73e8); color: white; align-self: flex-end; }
+        .chat-theirs { background: var(--ec-surface, #f8f9fa); color: var(--ec-text, #212529); align-self: flex-start; border: 1px solid var(--ec-border); }
     </style>
     <script src="https://isaiahnoelpulidosalazar.github.io/js/ECStyleSheet.js"></script>
+    <script src="https://isaiahnoelpulidosalazar.github.io/js/ECElements.js"></script>
 </head>
-<body class="backgroundColor-var(--bg-main) color-var(--text-main)">
+<body class="boxSizing-border-box fontFamily--apple-system,_BlinkMacSystemFont,_'Segoe_UI',_Roboto,_sans-serif">
 
-    <!-- Authentication View -->
+    <!-- AUTHENTICATION VIEW -->
     <div id="auth-view" class="display-flex justifyContent-center alignItems-center height-100vh">
-        <div class="eccard padding-30px width-400px backgroundColor-var(--bg-card)">
-            <h1 class="textAlign-center color-var(--primary) margin-0_0_20px_0">OOGWAY</h1>
-            
-            <form id="login-form" class="display-flex flexDirection-column gap-15px">
-                <input type="text" id="l-user" placeholder="Username" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
-                <input type="password" id="l-pass" placeholder="Password" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
-                <button type="submit" class="padding-10px backgroundColor-var(--primary) color-white border-none borderRadius-5px cursor-pointer ecbounce-5">Login</button>
-                <p class="textAlign-center fontSize-14px cursor-pointer color-var(--text-sec) hover:color-var(--primary)" onclick="toggleAuth()">Don't have an account? Register</p>
-            </form>
-
-            <form id="register-form" class="display-none flexDirection-column gap-15px">
-                <input type="text" id="r-fn" placeholder="First Name" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
-                <input type="text" id="r-ln" placeholder="Last Name" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
-                <input type="text" id="r-user" placeholder="Desired Username" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
-                <input type="password" id="r-pass" placeholder="Password" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
-                <button type="submit" class="padding-10px backgroundColor-#28a745 color-white border-none borderRadius-5px cursor-pointer ecbounce-5">Register</button>
-                <p class="textAlign-center fontSize-14px cursor-pointer color-var(--text-sec) hover:color-var(--primary)" onclick="toggleAuth()">Already have an account? Login</p>
-            </form>
-        </div>
+        <div id="auth-container" class="width-100% maxWidth-400px"></div>
     </div>
 
-    <!-- Main App View -->
+    <!-- MAIN APP VIEW -->
     <div id="app-view" class="display-none width-100vw height-100vh display-flex">
-        
-        <!-- Sidebar -->
-        <div class="width-250px backgroundColor-var(--bg-card) borderRight-1px_solid_var(--border) display-flex flexDirection-column mobile:display-none">
-            <h2 class="padding-20px color-var(--primary) margin-0 borderBottom-1px_solid_var(--border)">OOGWAY</h2>
-            <nav class="display-flex flexDirection-column padding-15px gap-10px flex-1">
-                <button onclick="switchTab('home')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">🏠 Home Feed</button>
-                <button onclick="switchTab('activities')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">📅 Activities Tracker</button>
-                <button onclick="switchTab('games')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">🎮 Mini Games</button>
-                <button onclick="switchTab('messages')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">💬 Messages</button>
-                <button onclick="switchTab('profile')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">👤 Profile</button>
-                <button onclick="switchTab('settings')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">⚙️ Settings</button>
-            </nav>
-        </div>
+        <!-- Sidebar container -->
+        <div id="sidebar-container" class="width-250px borderRight-1px_solid_var(--ec-border,_#dee2e6) background-var(--ec-bg,_#fff) display-flex flexDirection-column mobile:display-none"></div>
 
         <!-- Main Area -->
         <div class="flex-1 display-flex flexDirection-column overflow-hidden">
-            
-            <!-- Topbar -->
-            <div class="height-60px backgroundColor-var(--bg-card) borderBottom-1px_solid_var(--border) display-flex justifyContent-space-between alignItems-center padding-0_20px">
-                <div class="display-flex alignItems-center gap-10px">
-                    <div class="width-35px height-35px borderRadius-50% backgroundColor-var(--primary) color-white display-flex justifyContent-center alignItems-center">U</div>
-                    <span id="topbar-user" class="fontWeight-bold">User Name</span>
+            <!-- Custom Topbar (Not using ECTopbar as requested) -->
+            <div class="height-60px background-var(--ec-bg,_#fff) borderBottom-1px_solid_var(--ec-border,_#dee2e6) display-flex justifyContent-space-between alignItems-center padding-0_20px zIndex-800">
+                <div class="display-flex alignItems-center gap-10px" id="topbar-left">
+                    <!-- Avatar injected here -->
+                    <span id="topbar-user" class="fontWeight-600 color-var(--ec-text,_#212529)">User Name</span>
                 </div>
-                <div class="display-flex gap-15px">
-                    <button class="backgroundColor-var(--bg-main) border-none padding-8px_15px borderRadius-20px cursor-pointer color-var(--text-main) ecbounce-5">🔔 Notifs</button>
-                    <button onclick="logout()" class="backgroundColor-#dc3545 color-white border-none padding-8px_15px borderRadius-20px cursor-pointer ecbounce-5">Log Out</button>
+                <div class="display-flex gap-15px alignItems-center" id="topbar-actions">
+                    <!-- Notifications and Logout injected here -->
                 </div>
             </div>
 
-            <!-- Content Views -->
-            <div class="flex-1 overflowY-auto padding-20px position-relative display-flex justifyContent-center">
-                
-                <!-- Home / Social Feed -->
-                <div id="view-home" class="width-100% maxWidth-600px display-flex flexDirection-column gap-20px">
-                    
-                    <!-- Create Post -->
-                    <div class="eccard padding-15px backgroundColor-var(--bg-card)">
-                        <textarea id="post-text" placeholder="What's on your mind, Oogway master?" class="width-100% minHeight-80px border-none backgroundColor-transparent color-var(--text-main) fontSize-16px resize-none outline-none"></textarea>
-                        <div class="display-flex justifyContent-space-between alignItems-center marginTop-10px borderTop-1px_solid_var(--border) paddingTop-10px">
-                            <input type="file" id="post-img" class="color-var(--text-sec) fontSize-12px">
-                            <button onclick="createPost()" class="backgroundColor-var(--primary) color-white border-none padding-8px_20px borderRadius-5px cursor-pointer ecbounce-5">Post</button>
-                        </div>
-                    </div>
-
-                    <!-- Feed Container -->
-                    <div id="feed-container" class="display-flex flexDirection-column gap-15px">
-                        <!-- Post templates go here dynamically -->
-                        <div class="eccard padding-15px backgroundColor-var(--bg-card)">
-                            <div class="display-flex alignItems-center gap-10px marginBottom-10px">
-                                <b>Master Shifu</b> <span class="color-var(--text-sec) fontSize-12px">2 hrs ago</span>
-                            </div>
-                            <p class="margin-0">Welcome to OOGWAY social media! "There are no accidents."</p>
-                        </div>
-                    </div>
-
-                    <!-- Find Users to Follow -->
-                    <div class="eccard padding-15px backgroundColor-var(--bg-card) marginTop-20px">
-                        <h3 class="margin-0_0_15px_0">Find Users</h3>
-                        <div class="display-flex justifyContent-space-between alignItems-center borderBottom-1px_solid_var(--border) paddingBottom-10px">
-                            <span>Po The Panda</span>
-                            <button class="backgroundColor-var(--primary) color-white border-none padding-5px_10px borderRadius-5px cursor-pointer">Follow</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activities / Calendar -->
-                <div id="view-activities" class="display-none width-100% maxWidth-800px flexDirection-column gap-20px">
-                    <div class="display-flex justifyContent-space-between alignItems-center">
-                        <h2>Schedule Tracker</h2>
-                        <button class="backgroundColor-var(--primary) color-white border-none padding-10px_20px borderRadius-5px cursor-pointer">+ Add Event</button>
-                    </div>
-                    <!-- Calendar Grid (7 columns using ecgrid) -->
-                    <div class="ecgrid-7x5 gap-10px">
-                        <!-- Mon - Sun Headers -->
-                        <div class="textAlign-center fontWeight-bold">Mon</div><div class="textAlign-center fontWeight-bold">Tue</div>
-                        <div class="textAlign-center fontWeight-bold">Wed</div><div class="textAlign-center fontWeight-bold">Thu</div>
-                        <div class="textAlign-center fontWeight-bold">Fri</div><div class="textAlign-center fontWeight-bold">Sat</div>
-                        <div class="textAlign-center fontWeight-bold">Sun</div>
-                        <!-- Mock Days -->
-                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)">
-                            <span class="fontSize-12px">1</span>
-                            <div class="backgroundColor-#28a745 color-white fontSize-10px padding-2px borderRadius-3px marginTop-5px">Meeting</div>
-                        </div>
-                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">2</span></div>
-                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">3</span></div>
-                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">4</span></div>
-                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)">
-                            <span class="fontSize-12px">5</span>
-                            <div class="backgroundColor-var(--primary) color-white fontSize-10px padding-2px borderRadius-3px marginTop-5px">Gaming</div>
-                        </div>
-                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">6</span></div>
-                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">7</span></div>
-                    </div>
-                </div>
-
-                <!-- Mini Games Section -->
-                <div id="view-games" class="display-none width-100% maxWidth-800px flexDirection-column gap-20px">
-                    <h2>Mini Games Area</h2>
-                    <p class="color-var(--text-sec)">Pure HTML/CSS/JS games can be hosted within iframes below.</p>
-                    <div class="ecgrid-2x2 gap-20px">
-                        <div class="eccard padding-20px backgroundColor-var(--bg-card) display-flex flexDirection-column alignItems-center">
-                            <div class="width-100% height-150px backgroundColor-var(--bg-main) marginBottom-15px display-flex justifyContent-center alignItems-center">👾</div>
-                            <button class="width-100% backgroundColor-var(--primary) color-white border-none padding-10px borderRadius-5px cursor-pointer ecbounce-5">Play Snake</button>
-                        </div>
-                        <div class="eccard padding-20px backgroundColor-var(--bg-card) display-flex flexDirection-column alignItems-center">
-                            <div class="width-100% height-150px backgroundColor-var(--bg-main) marginBottom-15px display-flex justifyContent-center alignItems-center">⭕❌</div>
-                            <button class="width-100% backgroundColor-var(--primary) color-white border-none padding-10px borderRadius-5px cursor-pointer ecbounce-5">Play TicTacToe</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Messages -->
-                <div id="view-messages" class="display-none width-100% maxWidth-800px height-100% flexDirection-row gap-15px">
-                    <div class="width-200px eccard backgroundColor-var(--bg-card) padding-10px overflowY-auto">
-                        <h4 class="margin-0_0_10px_0">Chats</h4>
-                        <div class="padding-10px backgroundColor-var(--bg-main) borderRadius-5px cursor-pointer marginBottom-5px">Master Shifu</div>
-                        <div class="padding-10px hover:backgroundColor-var(--bg-main) borderRadius-5px cursor-pointer">Po</div>
-                    </div>
-                    <div class="flex-1 eccard backgroundColor-var(--bg-card) display-flex flexDirection-column">
-                        <div class="padding-15px borderBottom-1px_solid_var(--border) fontWeight-bold">Master Shifu</div>
-                        <div class="flex-1 padding-15px overflowY-auto display-flex flexDirection-column gap-10px">
-                            <div class="alignSelf-flex-start backgroundColor-var(--bg-main) padding-10px borderRadius-10px">Hello! Did you finish training?</div>
-                            <div class="alignSelf-flex-end backgroundColor-var(--primary) color-white padding-10px borderRadius-10px">Yes Master.</div>
-                        </div>
-                        <div class="padding-10px borderTop-1px_solid_var(--border) display-flex gap-10px">
-                            <input type="text" class="flex-1 border-1px_solid_var(--border) borderRadius-20px padding-0_15px backgroundColor-var(--bg-main) color-var(--text-main)" placeholder="Type a message...">
-                            <button class="backgroundColor-var(--primary) color-white border-none padding-10px_15px borderRadius-20px cursor-pointer">Send</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Profile -->
-                <div id="view-profile" class="display-none width-100% maxWidth-600px flexDirection-column gap-20px">
-                    <div class="eccard padding-30px backgroundColor-var(--bg-card) display-flex flexDirection-column alignItems-center">
-                        <div class="width-100px height-100px borderRadius-50% backgroundColor-var(--primary) color-white display-flex justifyContent-center alignItems-center fontSize-40px marginBottom-15px">U</div>
-                        <h2 id="prof-name" class="margin-0">User Name</h2>
-                        <p class="color-var(--text-sec)">Joined 2026</p>
-                        <button class="border-1px_solid_var(--border) backgroundColor-transparent padding-8px_15px borderRadius-5px cursor-pointer color-var(--text-main)">Edit Profile</button>
-                    </div>
-                </div>
-
-                <!-- Settings -->
-                <div id="view-settings" class="display-none width-100% maxWidth-600px flexDirection-column gap-20px">
-                    <div class="eccard padding-20px backgroundColor-var(--bg-card)">
-                        <h2>Settings</h2>
-                        <div class="display-flex justifyContent-space-between alignItems-center padding-10px_0 borderBottom-1px_solid_var(--border)">
-                            <span>Theme Mode</span>
-                            <select id="theme-selector" onchange="changeTheme(this.value)" class="padding-5px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)">
-                                <option value="light">Light Mode</option>
-                                <option value="dark">Dark Mode</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
+            <!-- Content Views Container -->
+            <div id="views-container" class="flex-1 overflowY-auto padding-20px position-relative display-flex justifyContent-center background-var(--ec-surface,_#f8f9fa)">
+                <div id="view-home" class="width-100% maxWidth-600px display-flex flexDirection-column gap-20px"></div>
+                <div id="view-activities" class="display-none width-100% maxWidth-800px flexDirection-column gap-20px"></div>
+                <div id="view-games" class="display-none width-100% maxWidth-800px flexDirection-column gap-20px"></div>
+                <div id="view-messages" class="display-none width-100% maxWidth-800px height-100% flexDirection-row gap-15px"></div>
+                <div id="view-profile" class="display-none width-100% maxWidth-600px flexDirection-column gap-20px"></div>
+                <div id="view-settings" class="display-none width-100% maxWidth-600px flexDirection-column gap-20px"></div>
             </div>
         </div>
     </div>
 
-    <!-- App Logic -->
+    <!-- Application Logic -->
     <script>
+        const API_BASE = 'https://oogway-gc-api.vercel.app/api'; 
         let currentUser = null;
-        const apiBase = 'https://oogway-gc-api.vercel.app/api';
+        let authToken = null;
+        let globalThemeColor = ECTheme.Blue; 
 
-        // Helper toggles Auth screen
-        function toggleAuth() {
-            const login = document.getElementById('login-form');
-            const reg = document.getElementById('register-form');
-            if (login.classList.contains('display-none')) {
-                login.classList.remove('display-none');
-                login.classList.add('display-flex');
-                reg.classList.add('display-none');
-                reg.classList.remove('display-flex');
-            } else {
-                login.classList.add('display-none');
-                login.classList.remove('display-flex');
-                reg.classList.remove('display-none');
-                reg.classList.add('display-flex');
+        // ---------------------------------------------------------
+        // 1. CORE & API UTILS
+        // ---------------------------------------------------------
+        async function apiFetch(endpoint, options = {}) {
+            if (!options.headers) options.headers = {};
+            if (authToken) options.headers['Authorization'] = authToken;
+            if (!(options.body instanceof FormData) && typeof options.body === 'object') {
+                options.headers['Content-Type'] = 'application/json';
+                options.body = JSON.stringify(options.body);
             }
+            const res = await fetch(`${API_BASE}${endpoint}`, options);
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: 'API Error' }));
+                throw new Error(err.error || 'Server Error');
+            }
+            return res.json();
         }
 
-        // Tab Switcher
+        // Convert file to Base64 (For real post functionality)
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         function switchTab(tabId) {
-            const views = document.querySelectorAll('[id^="view-"]');
-            views.forEach(v => {
+            document.querySelectorAll('[id^="view-"]').forEach(v => {
                 v.classList.remove('display-flex');
                 v.classList.add('display-none');
             });
             const target = document.getElementById(`view-${tabId}`);
             target.classList.remove('display-none');
             target.classList.add('display-flex');
-        }
-
-        // Apply theme 
-        function applyTheme(theme) {
-            if (theme === 'dark') {
-                document.body.classList.add('dark');
-            } else {
-                document.body.classList.remove('dark');
-            }
-            document.getElementById('theme-selector').value = theme;
-        }
-
-        function changeTheme(theme) {
-            applyTheme(theme);
-            const token = localStorage.getItem('token');
-            if(token) {
-                // Async save to DB
-                fetch(`${apiBase}/settings/theme`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                    body: JSON.stringify({ theme })
-                });
-            }
-        }
-
-        // Login Logic
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('l-user').value;
-            const password = document.getElementById('l-pass').value;
             
-            const res = await fetch(`${apiBase}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
+            // Trigger specific data reloads
+            if(tabId === 'home') loadHomeFeed();
+            if(tabId === 'activities') loadActivities();
+            if(tabId === 'messages') loadMessagesUI();
+        }
 
-            if (res.ok) {
-                const data = await res.json();
-                localStorage.setItem('token', data.token);
-                currentUser = data.user;
-                
-                applyTheme(data.theme);
-                document.getElementById('topbar-user').innerText = currentUser.name;
-                document.getElementById('prof-name').innerText = currentUser.name;
+        function applyThemeSettings(mode, colorName) {
+            // Apply Mode (Light/Dark)
+            if (mode === 'dark') {
+                document.body.style.setProperty('--ec-bg', '#1a1a2e');
+                document.body.style.setProperty('--ec-surface', '#16213e');
+                document.body.style.setProperty('--ec-text', '#e0e0e0');
+                document.body.style.setProperty('--ec-border', '#0f3460');
+            } else {
+                document.body.style.setProperty('--ec-bg', '#ffffff');
+                document.body.style.setProperty('--ec-surface', '#f8f9fa');
+                document.body.style.setProperty('--ec-text', '#212529');
+                document.body.style.setProperty('--ec-border', '#dee2e6');
+            }
+            // Apply Accent Color
+            const colors = { blue: '#1a73e8', green: '#2e7d32', red: '#c62828', purple: '#6a1b9a', orange: '#e65100' };
+            if (colors[colorName]) {
+                document.body.style.setProperty('--ec-accent', colors[colorName]);
+            }
+        }
 
+        // ---------------------------------------------------------
+        // 2. AUTHENTICATION & INIT
+        // ---------------------------------------------------------
+        function initApp() {
+            authToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
+
+            if (authToken && storedUser) {
+                currentUser = JSON.parse(storedUser);
+                applyThemeSettings(currentUser.themeMode || 'light', currentUser.themeColor || 'blue');
                 document.getElementById('auth-view').classList.add('display-none');
                 document.getElementById('app-view').classList.remove('display-none');
+                buildUI();
             } else {
-                const err = await res.json();
-                alert(err.error);
+                document.getElementById('auth-view').classList.remove('display-none');
+                document.getElementById('app-view').classList.add('display-none');
+                buildAuthUI();
             }
-        });
+        }
 
-        // Register Logic
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const body = {
-                firstName: document.getElementById('r-fn').value,
-                lastName: document.getElementById('r-ln').value,
-                username: document.getElementById('r-user').value,
-                password: document.getElementById('r-pass').value,
-            };
-
-            const res = await fetch(`${apiBase}/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-
-            if (res.ok) {
-                alert('Success! Please login.');
-                toggleAuth();
-            } else {
-                const err = await res.json();
-                alert(err.error);
-            }
-        });
-
-        // Logout
         function logout() {
-            localStorage.removeItem('token');
+            localStorage.clear();
+            authToken = null;
             currentUser = null;
-            document.getElementById('app-view').classList.add('display-none');
-            document.getElementById('auth-view').classList.remove('display-none');
+            window.location.reload();
         }
 
-        // Post creation (Uses Multi-part form-data for Images)
-        async function createPost() {
-            const text = document.getElementById('post-text').value;
-            const file = document.getElementById('post-img').files[0];
-            const token = localStorage.getItem('token');
+        function buildAuthUI() {
+            const container = document.getElementById('auth-container');
+            container.innerHTML = '';
+            
+            const card = new ECBasicCard();
+            const title = document.createElement('h1');
+            title.className = "color-var(--ec-accent,_#1a73e8) textAlign-center margin-0_0_20px";
+            title.textContent = "OOGWAY";
+            card.append(title);
 
-            if (!text && !file) return alert('Post cannot be empty!');
+            // Login Elements
+            const loginBox = document.createElement('div');
+            loginBox.className = "display-flex flexDirection-column gap-15px";
+            const userTxt = new ECTextbox({ placeholder: "Username" });
+            const passTxt = new ECTextbox({ type: "password", placeholder: "Password" });
+            const loginBtn = new ECButton("Login").onClick(async () => {
+                try {
+                    const data = await apiFetch('/login', { method: 'POST', body: { username: userTxt.getValue(), password: passTxt.getValue() }});
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    initApp();
+                } catch(err) {
+                    new ECToast(err.message, { type: 'error' }).show();
+                }
+            });
+            loginBox.appendChild(userTxt.element);
+            loginBox.appendChild(passTxt.element);
+            loginBox.appendChild(loginBtn.element);
 
-            const formData = new FormData();
-            formData.append('content', text);
-            if (file) formData.append('image', file);
+            card.append(loginBox);
+            container.appendChild(card.element);
+        }
 
-            const res = await fetch(`${apiBase}/posts`, {
-                method: 'POST',
-                headers: { 'Authorization': token },
-                body: formData
+        // ---------------------------------------------------------
+        // 3. UI BUILDERS (ECELEMENTS)
+        // ---------------------------------------------------------
+        function buildUI() {
+            buildTopbar();
+            buildSidebar();
+            buildHome();
+            buildActivities();
+            buildGames();
+            buildMessagesUI();
+            buildProfile();
+            buildSettings();
+            switchTab('home');
+        }
+
+        // TOPBAR
+        function buildTopbar() {
+            document.getElementById('topbar-user').textContent = currentUser.name;
+            const left = document.getElementById('topbar-left');
+            left.prepend(new ECAvatar({ initials: currentUser.name.charAt(0), size: "35px" }).element);
+
+            const actions = document.getElementById('topbar-actions');
+            actions.innerHTML = '';
+
+            // Notification Button (Icon Only)
+            const notifBtn = document.createElement('button');
+            notifBtn.className = "background-none border-none fontSize-20px cursor-pointer opacity-0.8 hover:opacity-1 transition-opacity_0.2s padding-0";
+            notifBtn.textContent = "🔔";
+
+            // Indicator for notifications
+            const indicator = new ECIndicator(notifBtn, { type: "notification" });
+            actions.appendChild(indicator.element);
+
+            // Notification Popup with Real Data List
+            const notifPopup = new ECPopup(notifBtn);
+            notifPopup.setWidth(300);
+            
+            notifBtn.addEventListener('click', async () => {
+                try {
+                    const notifs = await apiFetch('/notifications'); // Assumes real function
+                    const list = new ECList({ variant: 'hoverable' });
+                    notifs.forEach(n => list.addItem(n.message));
+                    notifPopup.setContent(list.element);
+                } catch(e) {
+                    notifPopup.setContent("<div class='padding-10px'>No new notifications</div>");
+                }
             });
 
-            if(res.ok) {
-                document.getElementById('post-text').value = '';
-                document.getElementById('post-img').value = '';
-                alert('Posted successfully!');
+            const logoutBtn = new ECButton("Log Out", { variant: "outline" }).onClick(logout);
+            actions.appendChild(logoutBtn.element);
+        }
+
+        // SIDEBAR
+        function buildSidebar() {
+            const container = document.getElementById('sidebar-container');
+            container.innerHTML = '';
+            
+            const title = document.createElement('h2');
+            title.className = "padding-20px margin-0 color-var(--ec-accent,_#1a73e8) borderBottom-1px_solid_var(--ec-border,_#dee2e6)";
+            title.textContent = "OOGWAY";
+            container.appendChild(title);
+
+            const nav = document.createElement('nav');
+            nav.className = "display-flex flexDirection-column padding-15px gap-10px flex-1";
+
+            const tabs =[
+                { id: 'home', icon: '🏠', label: 'Home Feed' },
+                { id: 'activities', icon: '📅', label: 'Activities' },
+                { id: 'games', icon: '🎮', label: 'Mini Games' },
+                { id: 'messages', icon: '💬', label: 'Messages' },
+                { id: 'profile', icon: '👤', label: 'Profile' },
+                { id: 'settings', icon: '⚙️', label: 'Settings' }
+            ];
+
+            tabs.forEach(tab => {
+                const btn = document.createElement('button');
+                btn.className = "textAlign-left padding-10px background-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--ec-text,_#212529) hover:background-var(--ec-surface,_#f8f9fa) transition-background_0.2s ecbounce-2";
+                btn.textContent = `${tab.icon} ${tab.label}`;
+                btn.onclick = () => switchTab(tab.id);
+                nav.appendChild(btn);
+            });
+            container.appendChild(nav);
+        }
+
+        // HOME FEED & POSTS
+        function buildHome() {
+            const container = document.getElementById('view-home');
+            container.innerHTML = '';
+
+            // Composer
+            const composerCard = new ECBasicCard();
+            const textInput = new ECTextbox({ placeholder: "What's on your mind, master?" });
+            const uploader = new ECFileUpload({ title: "Attach Image", subtitle: "Optional", multiple: false, accept: "image/*" });
+            const postBtn = new ECButton("Post").onClick(async () => {
+                postBtn.disable();
+                try {
+                    const content = textInput.getValue();
+                    const files = uploader.getFiles();
+                    let imageBase64 = null;
+                    if (files.length > 0) {
+                        imageBase64 = await fileToBase64(files[0]);
+                    }
+                    if(!content && !imageBase64) throw new Error("Post cannot be empty");
+
+                    await apiFetch('/posts', { method: 'POST', body: { content, imageBase64 } });
+                    new ECToast("Posted successfully!", { type: 'success' }).show();
+                    textInput.setValue('');
+                    uploader.clear();
+                    loadHomeFeed(); // Refresh feed
+                } catch(err) {
+                    new ECToast(err.message, { type: 'error' }).show();
+                }
+                postBtn.enable();
+            });
+
+            composerCard.append(textInput.element);
+            composerCard.append("<div class='marginTop-10px'></div>");
+            composerCard.append(uploader.element);
+            composerCard.append("<div class='marginTop-10px display-flex justifyContent-flex-end'></div>");
+            composerCard.element.lastChild.appendChild(postBtn.element);
+            container.appendChild(composerCard.element);
+
+            // Feed Container
+            const feedWrap = document.createElement('div');
+            feedWrap.id = 'feed-list';
+            feedWrap.className = 'display-flex flexDirection-column gap-15px width-100%';
+            container.appendChild(feedWrap);
+
+            // Suggested Users
+            const usersWrap = new ECBasicCard();
+            usersWrap.append("<h3 class='margin-0_0_15px'>Find Users</h3>");
+            const usersList = document.createElement('div');
+            usersList.id = 'suggested-users';
+            usersWrap.append(usersList);
+            container.appendChild(usersWrap.element);
+        }
+
+        async function loadHomeFeed() {
+            try {
+                const posts = await apiFetch('/posts');
+                const feedWrap = document.getElementById('feed-list');
+                feedWrap.innerHTML = '';
+                posts.forEach(p => {
+                    const card = new ECMediaCard({
+                        author: `${p.FirstName} ${p.LastName}`,
+                        timestamp: new Date(p.CreatedAt).toLocaleString(),
+                        content: p.Content,
+                        imageSrc: p.ImageUrl // Directly renders base64 from DB
+                    });
+                    feedWrap.appendChild(card.element);
+                });
+
+                // Load Users to Follow
+                const users = await apiFetch('/users/suggested').catch(() =>[]); // Mock handling if endpoint missing
+                const usersList = document.getElementById('suggested-users');
+                usersList.innerHTML = '';
+                users.forEach(u => {
+                    const row = document.createElement('div');
+                    row.className = "display-flex justifyContent-space-between alignItems-center padding-10px_0 borderBottom-1px_solid_var(--ec-border)";
+                    row.innerHTML = `<span>${u.FirstName} ${u.LastName} (@${u.Username})</span>`;
+                    const followBtn = new ECButton("Follow", { variant: "outline" }).onClick(async () => {
+                        await apiFetch('/follow', { method: 'POST', body: { targetId: u.Id } });
+                        new ECToast(`Followed ${u.FirstName}`, { type: 'success'}).show();
+                        loadHomeFeed();
+                    });
+                    row.appendChild(followBtn.element);
+                    usersList.appendChild(row);
+                });
+            } catch (err) {
+                console.error("Feed load error:", err);
             }
         }
+
+        // ACTIVITIES
+        function buildActivities() {
+            const container = document.getElementById('view-activities');
+            container.innerHTML = '';
+
+            const header = document.createElement('div');
+            header.className = "display-flex justifyContent-space-between alignItems-center";
+            header.innerHTML = `<h2 class="margin-0 color-var(--ec-text)">Activities Tracker</h2>`;
+            
+            // Add Modal
+            const addModal = new ECModal("Add Activity");
+            const titleInput = new ECTextbox({ label: "Event Title" });
+            const catSelect = new ECDropdown({ label: "Category", items:[{label:"Work", value:"Work"}, {label:"Personal", value:"Personal"}] });
+            const dateInput = new ECDatePicker({ label: "Date" });
+            
+            addModal.addContent(titleInput.element);
+            addModal.addContent("<br>");
+            addModal.addContent(catSelect.element);
+            addModal.addContent("<br>");
+            addModal.addContent(dateInput.element);
+
+            addModal.addFooterButton("Save Event", async () => {
+                try {
+                    await apiFetch('/activities', { method: 'POST', body: { title: titleInput.getValue(), category: catSelect.getValue(), date: dateInput.getValue() }});
+                    new ECToast("Activity saved!", { type: 'success' }).show();
+                    addModal.close();
+                    loadActivities();
+                } catch(err) { new ECToast(err.message, { type: 'error'}).show(); }
+            });
+            document.body.appendChild(addModal.element);
+
+            const addBtn = new ECButton("+ Add Event").onClick(() => addModal.open());
+            header.appendChild(addBtn.element);
+            container.appendChild(header);
+
+            // Tracker Table
+            const tableContainer = document.createElement('div');
+            tableContainer.id = "activities-table";
+            container.appendChild(tableContainer);
+        }
+
+        async function loadActivities() {
+            try {
+                const activities = await apiFetch('/activities').catch(() =>[]); // Real Function
+                const container = document.getElementById('activities-table');
+                container.innerHTML = '';
+                
+                const table = new ECDataTable({
+                    columns:[
+                        { key: "Title", label: "Event Title" },
+                        { key: "Category", label: "Category", render: (v) => new ECBadge(v, v==="Work" ? "primary" : "success").element },
+                        { key: "EventDate", label: "Date", render: (v) => new Date(v).toLocaleDateString() }
+                    ],
+                    data: activities,
+                    pageSize: 10
+                });
+                container.appendChild(table.element);
+            } catch(err) {}
+        }
+
+        // MINI GAMES (Updated to List Version)
+        function buildGames() {
+            const container = document.getElementById('view-games');
+            container.innerHTML = `<h2>Mini Games Hub</h2><p class="color-var(--ec-text-muted)">Select a game from the list to play.</p>`;
+            
+            const gameList = new ECList({ variant: "bordered", hoverable: true });
+            
+            const games =[
+                { name: "🐍 Snake Game", id: "snake" },
+                { name: "⭕❌ Tic-Tac-Toe", id: "tictactoe" },
+                { name: "🧱 Tetris", id: "tetris" }
+            ];
+
+            games.forEach(g => {
+                gameList.addItem(`<strong>${g.name}</strong> - Click to play`, () => {
+                    new ECToast(`Launching ${g.name}...`, {type: 'info'}).show();
+                    // Embed logic or redirect logic goes here
+                });
+            });
+
+            container.appendChild(gameList.element);
+        }
+
+        // MESSAGES
+        function buildMessagesUI() {
+            const container = document.getElementById('view-messages');
+            container.innerHTML = '';
+
+            // Left Pane (Users List)
+            const leftPane = new ECBasicCard();
+            leftPane.element.classList.add('width-250px', 'overflowY-auto');
+            leftPane.append("<h4 class='margin-0_0_15px'>Chats</h4>");
+            const chatList = new ECList({ variant: 'hoverable' });
+            chatList.element.id = "chat-user-list";
+            leftPane.append(chatList.element);
+            container.appendChild(leftPane.element);
+
+            // Right Pane (Chat Box)
+            const rightPane = new ECBasicCard();
+            rightPane.element.classList.add('flex-1', 'display-flex', 'flexDirection-column', 'padding-0');
+            
+            const chatHeader = document.createElement('div');
+            chatHeader.id = "chat-header";
+            chatHeader.className = "padding-15px borderBottom-1px_solid_var(--ec-border) fontWeight-600";
+            chatHeader.textContent = "Select a user to start chatting";
+            rightPane.append(chatHeader);
+
+            const chatHistory = document.createElement('div');
+            chatHistory.id = "chat-history";
+            chatHistory.className = "flex-1 padding-15px overflowY-auto display-flex flexDirection-column";
+            rightPane.append(chatHistory);
+
+            const chatInputArea = document.createElement('div');
+            chatInputArea.className = "padding-15px borderTop-1px_solid_var(--ec-border) display-flex gap-10px";
+            const msgInput = new ECTextbox({ placeholder: "Type a message..." });
+            msgInput.element.classList.add('flex-1');
+            const sendBtn = new ECButton("Send").onClick(async () => {
+                const targetId = chatHeader.dataset.targetId;
+                const text = msgInput.getValue();
+                if(!targetId || !text) return;
+                try {
+                    await apiFetch('/messages', { method: 'POST', body: { receiverId: targetId, message: text }});
+                    msgInput.setValue('');
+                    loadChatHistory(targetId);
+                } catch(e) { new ECToast("Failed to send", {type:'error'}).show(); }
+            });
+            chatInputArea.appendChild(msgInput.element);
+            chatInputArea.appendChild(sendBtn.element);
+            rightPane.append(chatInputArea);
+
+            container.appendChild(rightPane.element);
+        }
+
+        async function loadMessagesUI() {
+            try {
+                // Load users we follow or follow us
+                const users = await apiFetch('/users/friends').catch(() =>[]);
+                const list = document.getElementById('chat-user-list');
+                list.innerHTML = '';
+                users.forEach(u => {
+                    const li = document.createElement('li');
+                    li.className = "padding-10px cursor-pointer hover:background-var(--ec-surface) borderRadius-6px transition-background_0.2s";
+                    li.textContent = `${u.FirstName} ${u.LastName}`;
+                    li.onclick = () => {
+                        document.getElementById('chat-header').textContent = `${u.FirstName} ${u.LastName}`;
+                        document.getElementById('chat-header').dataset.targetId = u.Id;
+                        loadChatHistory(u.Id);
+                    };
+                    list.appendChild(li);
+                });
+            } catch(e) {}
+        }
+
+        async function loadChatHistory(userId) {
+            try {
+                const msgs = await apiFetch(`/messages/${userId}`).catch(() =>[]);
+                const history = document.getElementById('chat-history');
+                history.innerHTML = '';
+                msgs.forEach(m => {
+                    const bubble = document.createElement('div');
+                    const isMine = m.SenderId === currentUser.id;
+                    bubble.className = `chat-bubble ${isMine ? 'chat-mine' : 'chat-theirs'}`;
+                    bubble.textContent = m.MessageText;
+                    history.appendChild(bubble);
+                });
+                history.scrollTop = history.scrollHeight;
+            } catch(e) {}
+        }
+
+        // PROFILE
+        function buildProfile() {
+            const container = document.getElementById('view-profile');
+            container.innerHTML = '';
+            
+            const card = new ECBasicCard();
+            card.element.classList.add('display-flex', 'flexDirection-column', 'alignItems-center', 'textAlign-center');
+            
+            card.append(new ECAvatar({ initials: currentUser.name.charAt(0), size: "80px" }).element);
+            card.append(`<h2 class="margin-10px_0_5px">${currentUser.name}</h2>`);
+            card.append(`<p class="color-var(--ec-text-muted) margin-0_0_20px">Member of Oogway</p>`);
+
+            const editModal = new ECModal("Edit Profile");
+            const bioInput = new ECTextbox({ label: "Bio" });
+            editModal.addContent(bioInput.element);
+            editModal.addFooterButton("Save", () => {
+                new ECToast("Profile updated!", {type: 'success'}).show();
+                editModal.close();
+            });
+            document.body.appendChild(editModal.element);
+
+            card.append(new ECButton("Edit Profile", {variant: "outline"}).onClick(() => editModal.open()).element);
+            
+            container.appendChild(card.element);
+        }
+
+        // SETTINGS (Expanded Theme Picker)
+        function buildSettings() {
+            const container = document.getElementById('view-settings');
+            container.innerHTML = '';
+
+            const card = new ECBasicCard();
+            card.append("<h2>Settings</h2>");
+            card.append(new ECDivider().element);
+            card.append("<h3>Theme Settings</h3>");
+
+            // Dark Mode Toggle
+            const modeToggle = new ECToggle("Dark Mode", currentUser.themeMode === 'dark').onChange(async (isDark) => {
+                const mode = isDark ? 'dark' : 'light';
+                currentUser.themeMode = mode;
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                applyThemeSettings(mode, currentUser.themeColor || 'blue');
+                await apiFetch('/settings/theme', { method: 'PUT', body: { theme: mode, color: currentUser.themeColor } }).catch(()=>{});
+            });
+            card.append(modeToggle.element);
+            card.append("<br><br>");
+
+            // Color Scheme Picker
+            card.append("<p class='fontSize-14px fontWeight-500 margin-0_0_10px'>Accent Color Scheme</p>");
+            const colorOptions =[
+                { label: "Oogway Blue", value: "blue", checked: currentUser.themeColor === 'blue' },
+                { label: "Turtle Green", value: "green", checked: currentUser.themeColor === 'green' },
+                { label: "Dragon Red", value: "red", checked: currentUser.themeColor === 'red' },
+                { label: "Mystic Purple", value: "purple", checked: currentUser.themeColor === 'purple' },
+                { label: "Tiger Orange", value: "orange", checked: currentUser.themeColor === 'orange' }
+            ];
+            
+            const colorRadio = new ECRadio("color-scheme", colorOptions).onChange(async (val) => {
+                currentUser.themeColor = val;
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                applyThemeSettings(currentUser.themeMode || 'light', val);
+                await apiFetch('/settings/theme', { method: 'PUT', body: { theme: currentUser.themeMode, color: val } }).catch(()=>{});
+            });
+
+            card.append(colorRadio.element);
+
+            container.appendChild(card.element);
+        }
+
+        // Boot
+        document.addEventListener("DOMContentLoaded", initApp);
     </script>
 </body>
 </html>
