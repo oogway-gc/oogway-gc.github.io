@@ -1,601 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OOGWAY</title>
-    <!-- Basic resets, specific theme variables are handled by ECElements -->
-    <style>
-        body { margin: 0; padding: 0; overflow: hidden; background: var(--ec-bg, #f0f2f5); transition: background 0.3s; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: var(--ec-border, #ced0d4); border-radius: 4px; }
-        .chat-bubble { padding: 10px; border-radius: 12px; margin-bottom: 8px; max-width: 80%; width: fit-content; }
-        .chat-mine { background: var(--ec-accent, #1a73e8); color: white; align-self: flex-end; }
-        .chat-theirs { background: var(--ec-surface, #f8f9fa); color: var(--ec-text, #212529); align-self: flex-start; border: 1px solid var(--ec-border); }
-    </style>
-    <script src="https://isaiahnoelpulidosalazar.github.io/js/ECStyleSheet.js"></script>
-    <script src="https://isaiahnoelpulidosalazar.github.io/js/ECElements.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oogway – Login</title>
+  <link rel="stylesheet" href="assets/css/themes.css" />
+  <script>window.OOGWAY_API = "https://oogway-gc-api.vercel.app";</script>
+  <style>
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); }
+    .auth-wrap { width: 100%; max-width: 420px; padding: 16px; }
+    .auth-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 24px; padding: 36px 32px; box-shadow: var(--shadow); }
+    .auth-logo { text-align: center; margin-bottom: 28px; }
+    .auth-logo .logo-text { font-size: 34px; font-weight: 900; background: var(--btn-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
+    .auth-logo .tagline { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    .tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid var(--border); }
+    .tab { flex: 1; padding: 10px; text-align: center; font-weight: 600; font-size: 14.5px; cursor: pointer; color: var(--text-muted); border-bottom: 2.5px solid transparent; margin-bottom: -2px; transition: color 0.15s, border-color 0.15s; }
+    .tab.active { color: var(--accent1); border-color: var(--accent1); }
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+    .name-row { display: flex; gap: 10px; }
+    .name-row .form-group { flex: 1; }
+    .btn-primary { width: 100%; padding: 12px; font-size: 15px; margin-top: 6px; }
+    .divider { text-align: center; color: var(--text-muted); font-size: 13px; margin: 14px 0; }
+    .error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; display: none; }
+  </style>
+  <script src="https://isaiahnoelpulidosalazar.github.io/js/ECStyleSheet.js"></script>
+  <script src="https://isaiahnoelpulidosalazar.github.io/js/ECElements.js"></script>
 </head>
-<body class="boxSizing-border-box fontFamily--apple-system,_BlinkMacSystemFont,_'Segoe_UI',_Roboto,_sans-serif">
-
-    <!-- AUTHENTICATION VIEW -->
-    <div id="auth-view" class="display-flex justifyContent-center alignItems-center height-100vh">
-        <div id="auth-container" class="width-100% maxWidth-400px"></div>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-text">🐢 Oogway</div>
+      <div class="tagline">Slow and steady, connected forever.</div>
     </div>
 
-    <!-- MAIN APP VIEW -->
-    <div id="app-view" class="display-none width-100vw height-100vh display-flex">
-        <!-- Sidebar container -->
-        <div id="sidebar-container" class="width-250px borderRight-1px_solid_var(--ec-border,_#dee2e6) background-var(--ec-bg,_#fff) display-flex flexDirection-column mobile:display-none"></div>
+    <div class="tabs">
+      <div class="tab active" data-tab="login">Sign In</div>
+      <div class="tab" data-tab="register">Register</div>
+    </div>
 
-        <!-- Main Area -->
-        <div class="flex-1 display-flex flexDirection-column overflow-hidden">
-            <!-- Custom Topbar (Not using ECTopbar as requested) -->
-            <div class="height-60px background-var(--ec-bg,_#fff) borderBottom-1px_solid_var(--ec-border,_#dee2e6) display-flex justifyContent-space-between alignItems-center padding-0_20px zIndex-800">
-                <div class="display-flex alignItems-center gap-10px" id="topbar-left">
-                    <!-- Avatar injected here -->
-                    <span id="topbar-user" class="fontWeight-600 color-var(--ec-text,_#212529)">User Name</span>
-                </div>
-                <div class="display-flex gap-15px alignItems-center" id="topbar-actions">
-                    <!-- Notifications and Logout injected here -->
-                </div>
-            </div>
+    <!-- Login Form -->
+    <div class="form-section active" id="section-login">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="login-username" placeholder="your_username" autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <div class="error-msg" id="login-error"></div>
+      <button class="btn btn-primary" id="login-btn">Sign In</button>
+    </div>
 
-            <!-- Content Views Container -->
-            <div id="views-container" class="flex-1 overflowY-auto padding-20px position-relative display-flex justifyContent-center background-var(--ec-surface,_#f8f9fa)">
-                <div id="view-home" class="width-100% maxWidth-600px display-flex flexDirection-column gap-20px"></div>
-                <div id="view-activities" class="display-none width-100% maxWidth-800px flexDirection-column gap-20px"></div>
-                <div id="view-games" class="display-none width-100% maxWidth-800px flexDirection-column gap-20px"></div>
-                <div id="view-messages" class="display-none width-100% maxWidth-800px height-100% flexDirection-row gap-15px"></div>
-                <div id="view-profile" class="display-none width-100% maxWidth-600px flexDirection-column gap-20px"></div>
-                <div id="view-settings" class="display-none width-100% maxWidth-600px flexDirection-column gap-20px"></div>
-            </div>
+    <!-- Register Form -->
+    <div class="form-section" id="section-register">
+      <div class="name-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="reg-firstname" placeholder="John" />
         </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="reg-lastname" placeholder="Doe" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="reg-username" placeholder="john_doe" autocomplete="username" />
+        <div class="form-error" id="reg-username-error" style="display:none"></div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password" />
+      </div>
+      <div class="error-msg" id="reg-error"></div>
+      <button class="btn btn-primary" id="reg-btn">Create Account</button>
     </div>
+  </div>
+</div>
 
-    <!-- Application Logic -->
-    <script>
-        const API_BASE = 'https://oogway-gc-api.vercel.app/api'; 
-        let currentUser = null;
-        let authToken = null;
-        let globalThemeColor = ECTheme.Blue; 
+<div class="toast-container" id="toast-container"></div>
 
-        // ---------------------------------------------------------
-        // 1. CORE & API UTILS
-        // ---------------------------------------------------------
-        async function apiFetch(endpoint, options = {}) {
-            if (!options.headers) options.headers = {};
-            if (authToken) options.headers['Authorization'] = authToken;
-            if (!(options.body instanceof FormData) && typeof options.body === 'object') {
-                options.headers['Content-Type'] = 'application/json';
-                options.body = JSON.stringify(options.body);
-            }
-            const res = await fetch(`${API_BASE}${endpoint}`, options);
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({ error: 'API Error' }));
-                throw new Error(err.error || 'Server Error');
-            }
-            return res.json();
-        }
+<script src="assets/js/api.js"></script>
+<script>
+(function() {
+  // Redirect if already logged in
+  if (OogwayAPI.getSession() && OogwayAPI.getUser()) {
+    location.href = "app.html";
+  }
 
-        // Convert file to Base64 (For real post functionality)
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
+  // Tabs
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".form-section").forEach(s => s.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("section-" + tab.dataset.tab).classList.add("active");
+    });
+  });
 
-        function switchTab(tabId) {
-            document.querySelectorAll('[id^="view-"]').forEach(v => {
-                v.classList.remove('display-flex');
-                v.classList.add('display-none');
-            });
-            const target = document.getElementById(`view-${tabId}`);
-            target.classList.remove('display-none');
-            target.classList.add('display-flex');
-            
-            // Trigger specific data reloads
-            if(tabId === 'home') loadHomeFeed();
-            if(tabId === 'activities') loadActivities();
-            if(tabId === 'messages') loadMessagesUI();
-        }
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = "block";
+  }
+  function hideError(id) {
+    const el = document.getElementById(id);
+    el.style.display = "none";
+  }
 
-        function applyThemeSettings(mode, colorName) {
-            // Apply Mode (Light/Dark)
-            if (mode === 'dark') {
-                document.body.style.setProperty('--ec-bg', '#1a1a2e');
-                document.body.style.setProperty('--ec-surface', '#16213e');
-                document.body.style.setProperty('--ec-text', '#e0e0e0');
-                document.body.style.setProperty('--ec-border', '#0f3460');
-            } else {
-                document.body.style.setProperty('--ec-bg', '#ffffff');
-                document.body.style.setProperty('--ec-surface', '#f8f9fa');
-                document.body.style.setProperty('--ec-text', '#212529');
-                document.body.style.setProperty('--ec-border', '#dee2e6');
-            }
-            // Apply Accent Color
-            const colors = { blue: '#1a73e8', green: '#2e7d32', red: '#c62828', purple: '#6a1b9a', orange: '#e65100' };
-            if (colors[colorName]) {
-                document.body.style.setProperty('--ec-accent', colors[colorName]);
-            }
-        }
+  function toast(msg, type) {
+    const c = document.getElementById("toast-container");
+    const t = document.createElement("div");
+    t.className = "toast " + (type || "");
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
 
-        // ---------------------------------------------------------
-        // 2. AUTHENTICATION & INIT
-        // ---------------------------------------------------------
-        function initApp() {
-            authToken = localStorage.getItem('token');
-            const storedUser = localStorage.getItem('user');
+  // Login
+  document.getElementById("login-btn").addEventListener("click", async () => {
+    const username = document.getElementById("login-username").value.trim();
+    const password = document.getElementById("login-password").value;
+    hideError("login-error");
+    if (!username || !password) return showError("login-error", "Please fill in all fields.");
+    const btn = document.getElementById("login-btn");
+    btn.disabled = true; btn.textContent = "Signing in...";
+    try {
+      await OogwayAPI.Auth.login({ username, password });
+      location.href = "app.html";
+    } catch (e) {
+      showError("login-error", e.message || "Login failed.");
+    } finally {
+      btn.disabled = false; btn.textContent = "Sign In";
+    }
+  });
 
-            if (authToken && storedUser) {
-                currentUser = JSON.parse(storedUser);
-                applyThemeSettings(currentUser.themeMode || 'light', currentUser.themeColor || 'blue');
-                document.getElementById('auth-view').classList.add('display-none');
-                document.getElementById('app-view').classList.remove('display-none');
-                buildUI();
-            } else {
-                document.getElementById('auth-view').classList.remove('display-none');
-                document.getElementById('app-view').classList.add('display-none');
-                buildAuthUI();
-            }
-        }
+  // Register
+  document.getElementById("reg-btn").addEventListener("click", async () => {
+    const first_name = document.getElementById("reg-firstname").value.trim();
+    const last_name = document.getElementById("reg-lastname").value.trim();
+    const username = document.getElementById("reg-username").value.trim();
+    const password = document.getElementById("reg-password").value;
+    hideError("reg-error");
+    document.getElementById("reg-username-error").style.display = "none";
+    if (!first_name || !last_name || !username || !password) return showError("reg-error", "All fields are required.");
+    if (username.length < 3) return showError("reg-error", "Username must be at least 3 characters.");
+    if (password.length < 6) return showError("reg-error", "Password must be at least 6 characters.");
+    const btn = document.getElementById("reg-btn");
+    btn.disabled = true; btn.textContent = "Creating account...";
+    try {
+      await OogwayAPI.Auth.register({ first_name, last_name, username, password });
+      location.href = "app.html";
+    } catch (e) {
+      if (e.status === 409) {
+        const el = document.getElementById("reg-username-error");
+        el.textContent = "Username already taken. Try another!";
+        el.style.display = "block";
+      } else {
+        showError("reg-error", e.message || "Registration failed.");
+      }
+    } finally {
+      btn.disabled = false; btn.textContent = "Create Account";
+    }
+  });
 
-        function logout() {
-            localStorage.clear();
-            authToken = null;
-            currentUser = null;
-            window.location.reload();
-        }
-
-        function buildAuthUI() {
-            const container = document.getElementById('auth-container');
-            container.innerHTML = '';
-            
-            const card = new ECBasicCard();
-            const title = document.createElement('h1');
-            title.className = "color-var(--ec-accent,_#1a73e8) textAlign-center margin-0_0_20px";
-            title.textContent = "OOGWAY";
-            card.append(title);
-
-            // Login Elements
-            const loginBox = document.createElement('div');
-            loginBox.className = "display-flex flexDirection-column gap-15px";
-            const userTxt = new ECTextbox({ placeholder: "Username" });
-            const passTxt = new ECTextbox({ type: "password", placeholder: "Password" });
-            const loginBtn = new ECButton("Login").onClick(async () => {
-                try {
-                    const data = await apiFetch('/login', { method: 'POST', body: { username: userTxt.getValue(), password: passTxt.getValue() }});
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    initApp();
-                } catch(err) {
-                    new ECToast(err.message, { type: 'error' }).show();
-                }
-            });
-            loginBox.appendChild(userTxt.element);
-            loginBox.appendChild(passTxt.element);
-            loginBox.appendChild(loginBtn.element);
-
-            card.append(loginBox);
-            container.appendChild(card.element);
-        }
-
-        // ---------------------------------------------------------
-        // 3. UI BUILDERS (ECELEMENTS)
-        // ---------------------------------------------------------
-        function buildUI() {
-            buildTopbar();
-            buildSidebar();
-            buildHome();
-            buildActivities();
-            buildGames();
-            buildMessagesUI();
-            buildProfile();
-            buildSettings();
-            switchTab('home');
-        }
-
-        // TOPBAR
-        function buildTopbar() {
-            document.getElementById('topbar-user').textContent = currentUser.name;
-            const left = document.getElementById('topbar-left');
-            left.prepend(new ECAvatar({ initials: currentUser.name.charAt(0), size: "35px" }).element);
-
-            const actions = document.getElementById('topbar-actions');
-            actions.innerHTML = '';
-
-            // Notification Button (Icon Only)
-            const notifBtn = document.createElement('button');
-            notifBtn.className = "background-none border-none fontSize-20px cursor-pointer opacity-0.8 hover:opacity-1 transition-opacity_0.2s padding-0";
-            notifBtn.textContent = "🔔";
-
-            // Indicator for notifications
-            const indicator = new ECIndicator(notifBtn, { type: "notification" });
-            actions.appendChild(indicator.element);
-
-            // Notification Popup with Real Data List
-            const notifPopup = new ECPopup(notifBtn);
-            notifPopup.setWidth(300);
-            
-            notifBtn.addEventListener('click', async () => {
-                try {
-                    const notifs = await apiFetch('/notifications'); // Assumes real function
-                    const list = new ECList({ variant: 'hoverable' });
-                    notifs.forEach(n => list.addItem(n.message));
-                    notifPopup.setContent(list.element);
-                } catch(e) {
-                    notifPopup.setContent("<div class='padding-10px'>No new notifications</div>");
-                }
-            });
-
-            const logoutBtn = new ECButton("Log Out", { variant: "outline" }).onClick(logout);
-            actions.appendChild(logoutBtn.element);
-        }
-
-        // SIDEBAR
-        function buildSidebar() {
-            const container = document.getElementById('sidebar-container');
-            container.innerHTML = '';
-            
-            const title = document.createElement('h2');
-            title.className = "padding-20px margin-0 color-var(--ec-accent,_#1a73e8) borderBottom-1px_solid_var(--ec-border,_#dee2e6)";
-            title.textContent = "OOGWAY";
-            container.appendChild(title);
-
-            const nav = document.createElement('nav');
-            nav.className = "display-flex flexDirection-column padding-15px gap-10px flex-1";
-
-            const tabs =[
-                { id: 'home', icon: '🏠', label: 'Home Feed' },
-                { id: 'activities', icon: '📅', label: 'Activities' },
-                { id: 'games', icon: '🎮', label: 'Mini Games' },
-                { id: 'messages', icon: '💬', label: 'Messages' },
-                { id: 'profile', icon: '👤', label: 'Profile' },
-                { id: 'settings', icon: '⚙️', label: 'Settings' }
-            ];
-
-            tabs.forEach(tab => {
-                const btn = document.createElement('button');
-                btn.className = "textAlign-left padding-10px background-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--ec-text,_#212529) hover:background-var(--ec-surface,_#f8f9fa) transition-background_0.2s ecbounce-2";
-                btn.textContent = `${tab.icon} ${tab.label}`;
-                btn.onclick = () => switchTab(tab.id);
-                nav.appendChild(btn);
-            });
-            container.appendChild(nav);
-        }
-
-        // HOME FEED & POSTS
-        function buildHome() {
-            const container = document.getElementById('view-home');
-            container.innerHTML = '';
-
-            // Composer
-            const composerCard = new ECBasicCard();
-            const textInput = new ECTextbox({ placeholder: "What's on your mind, master?" });
-            const uploader = new ECFileUpload({ title: "Attach Image", subtitle: "Optional", multiple: false, accept: "image/*" });
-            const postBtn = new ECButton("Post").onClick(async () => {
-                postBtn.disable();
-                try {
-                    const content = textInput.getValue();
-                    const files = uploader.getFiles();
-                    let imageBase64 = null;
-                    if (files.length > 0) {
-                        imageBase64 = await fileToBase64(files[0]);
-                    }
-                    if(!content && !imageBase64) throw new Error("Post cannot be empty");
-
-                    await apiFetch('/posts', { method: 'POST', body: { content, imageBase64 } });
-                    new ECToast("Posted successfully!", { type: 'success' }).show();
-                    textInput.setValue('');
-                    uploader.clear();
-                    loadHomeFeed(); // Refresh feed
-                } catch(err) {
-                    new ECToast(err.message, { type: 'error' }).show();
-                }
-                postBtn.enable();
-            });
-
-            composerCard.append(textInput.element);
-            composerCard.append("<div class='marginTop-10px'></div>");
-            composerCard.append(uploader.element);
-            composerCard.append("<div class='marginTop-10px display-flex justifyContent-flex-end'></div>");
-            composerCard.element.lastChild.appendChild(postBtn.element);
-            container.appendChild(composerCard.element);
-
-            // Feed Container
-            const feedWrap = document.createElement('div');
-            feedWrap.id = 'feed-list';
-            feedWrap.className = 'display-flex flexDirection-column gap-15px width-100%';
-            container.appendChild(feedWrap);
-
-            // Suggested Users
-            const usersWrap = new ECBasicCard();
-            usersWrap.append("<h3 class='margin-0_0_15px'>Find Users</h3>");
-            const usersList = document.createElement('div');
-            usersList.id = 'suggested-users';
-            usersWrap.append(usersList);
-            container.appendChild(usersWrap.element);
-        }
-
-        async function loadHomeFeed() {
-            try {
-                const posts = await apiFetch('/posts');
-                const feedWrap = document.getElementById('feed-list');
-                feedWrap.innerHTML = '';
-                posts.forEach(p => {
-                    const card = new ECMediaCard({
-                        author: `${p.FirstName} ${p.LastName}`,
-                        timestamp: new Date(p.CreatedAt).toLocaleString(),
-                        content: p.Content,
-                        imageSrc: p.ImageUrl // Directly renders base64 from DB
-                    });
-                    feedWrap.appendChild(card.element);
-                });
-
-                // Load Users to Follow
-                const users = await apiFetch('/users/suggested').catch(() =>[]); // Mock handling if endpoint missing
-                const usersList = document.getElementById('suggested-users');
-                usersList.innerHTML = '';
-                users.forEach(u => {
-                    const row = document.createElement('div');
-                    row.className = "display-flex justifyContent-space-between alignItems-center padding-10px_0 borderBottom-1px_solid_var(--ec-border)";
-                    row.innerHTML = `<span>${u.FirstName} ${u.LastName} (@${u.Username})</span>`;
-                    const followBtn = new ECButton("Follow", { variant: "outline" }).onClick(async () => {
-                        await apiFetch('/follow', { method: 'POST', body: { targetId: u.Id } });
-                        new ECToast(`Followed ${u.FirstName}`, { type: 'success'}).show();
-                        loadHomeFeed();
-                    });
-                    row.appendChild(followBtn.element);
-                    usersList.appendChild(row);
-                });
-            } catch (err) {
-                console.error("Feed load error:", err);
-            }
-        }
-
-        // ACTIVITIES
-        function buildActivities() {
-            const container = document.getElementById('view-activities');
-            container.innerHTML = '';
-
-            const header = document.createElement('div');
-            header.className = "display-flex justifyContent-space-between alignItems-center";
-            header.innerHTML = `<h2 class="margin-0 color-var(--ec-text)">Activities Tracker</h2>`;
-            
-            // Add Modal
-            const addModal = new ECModal("Add Activity");
-            const titleInput = new ECTextbox({ label: "Event Title" });
-            const catSelect = new ECDropdown({ label: "Category", items:[{label:"Work", value:"Work"}, {label:"Personal", value:"Personal"}] });
-            const dateInput = new ECDatePicker({ label: "Date" });
-            
-            addModal.addContent(titleInput.element);
-            addModal.addContent("<br>");
-            addModal.addContent(catSelect.element);
-            addModal.addContent("<br>");
-            addModal.addContent(dateInput.element);
-
-            addModal.addFooterButton("Save Event", async () => {
-                try {
-                    await apiFetch('/activities', { method: 'POST', body: { title: titleInput.getValue(), category: catSelect.getValue(), date: dateInput.getValue() }});
-                    new ECToast("Activity saved!", { type: 'success' }).show();
-                    addModal.close();
-                    loadActivities();
-                } catch(err) { new ECToast(err.message, { type: 'error'}).show(); }
-            });
-            document.body.appendChild(addModal.element);
-
-            const addBtn = new ECButton("+ Add Event").onClick(() => addModal.open());
-            header.appendChild(addBtn.element);
-            container.appendChild(header);
-
-            // Tracker Table
-            const tableContainer = document.createElement('div');
-            tableContainer.id = "activities-table";
-            container.appendChild(tableContainer);
-        }
-
-        async function loadActivities() {
-            try {
-                const activities = await apiFetch('/activities').catch(() =>[]); // Real Function
-                const container = document.getElementById('activities-table');
-                container.innerHTML = '';
-                
-                const table = new ECDataTable({
-                    columns:[
-                        { key: "Title", label: "Event Title" },
-                        { key: "Category", label: "Category", render: (v) => new ECBadge(v, v==="Work" ? "primary" : "success").element },
-                        { key: "EventDate", label: "Date", render: (v) => new Date(v).toLocaleDateString() }
-                    ],
-                    data: activities,
-                    pageSize: 10
-                });
-                container.appendChild(table.element);
-            } catch(err) {}
-        }
-
-        // MINI GAMES (Updated to List Version)
-        function buildGames() {
-            const container = document.getElementById('view-games');
-            container.innerHTML = `<h2>Mini Games Hub</h2><p class="color-var(--ec-text-muted)">Select a game from the list to play.</p>`;
-            
-            const gameList = new ECList({ variant: "bordered", hoverable: true });
-            
-            const games =[
-                { name: "🐍 Snake Game", id: "snake" },
-                { name: "⭕❌ Tic-Tac-Toe", id: "tictactoe" },
-                { name: "🧱 Tetris", id: "tetris" }
-            ];
-
-            games.forEach(g => {
-                gameList.addItem(`<strong>${g.name}</strong> - Click to play`, () => {
-                    new ECToast(`Launching ${g.name}...`, {type: 'info'}).show();
-                    // Embed logic or redirect logic goes here
-                });
-            });
-
-            container.appendChild(gameList.element);
-        }
-
-        // MESSAGES
-        function buildMessagesUI() {
-            const container = document.getElementById('view-messages');
-            container.innerHTML = '';
-
-            // Left Pane (Users List)
-            const leftPane = new ECBasicCard();
-            leftPane.element.classList.add('width-250px', 'overflowY-auto');
-            leftPane.append("<h4 class='margin-0_0_15px'>Chats</h4>");
-            const chatList = new ECList({ variant: 'hoverable' });
-            chatList.element.id = "chat-user-list";
-            leftPane.append(chatList.element);
-            container.appendChild(leftPane.element);
-
-            // Right Pane (Chat Box)
-            const rightPane = new ECBasicCard();
-            rightPane.element.classList.add('flex-1', 'display-flex', 'flexDirection-column', 'padding-0');
-            
-            const chatHeader = document.createElement('div');
-            chatHeader.id = "chat-header";
-            chatHeader.className = "padding-15px borderBottom-1px_solid_var(--ec-border) fontWeight-600";
-            chatHeader.textContent = "Select a user to start chatting";
-            rightPane.append(chatHeader);
-
-            const chatHistory = document.createElement('div');
-            chatHistory.id = "chat-history";
-            chatHistory.className = "flex-1 padding-15px overflowY-auto display-flex flexDirection-column";
-            rightPane.append(chatHistory);
-
-            const chatInputArea = document.createElement('div');
-            chatInputArea.className = "padding-15px borderTop-1px_solid_var(--ec-border) display-flex gap-10px";
-            const msgInput = new ECTextbox({ placeholder: "Type a message..." });
-            msgInput.element.classList.add('flex-1');
-            const sendBtn = new ECButton("Send").onClick(async () => {
-                const targetId = chatHeader.dataset.targetId;
-                const text = msgInput.getValue();
-                if(!targetId || !text) return;
-                try {
-                    await apiFetch('/messages', { method: 'POST', body: { receiverId: targetId, message: text }});
-                    msgInput.setValue('');
-                    loadChatHistory(targetId);
-                } catch(e) { new ECToast("Failed to send", {type:'error'}).show(); }
-            });
-            chatInputArea.appendChild(msgInput.element);
-            chatInputArea.appendChild(sendBtn.element);
-            rightPane.append(chatInputArea);
-
-            container.appendChild(rightPane.element);
-        }
-
-        async function loadMessagesUI() {
-            try {
-                // Load users we follow or follow us
-                const users = await apiFetch('/users/friends').catch(() =>[]);
-                const list = document.getElementById('chat-user-list');
-                list.innerHTML = '';
-                users.forEach(u => {
-                    const li = document.createElement('li');
-                    li.className = "padding-10px cursor-pointer hover:background-var(--ec-surface) borderRadius-6px transition-background_0.2s";
-                    li.textContent = `${u.FirstName} ${u.LastName}`;
-                    li.onclick = () => {
-                        document.getElementById('chat-header').textContent = `${u.FirstName} ${u.LastName}`;
-                        document.getElementById('chat-header').dataset.targetId = u.Id;
-                        loadChatHistory(u.Id);
-                    };
-                    list.appendChild(li);
-                });
-            } catch(e) {}
-        }
-
-        async function loadChatHistory(userId) {
-            try {
-                const msgs = await apiFetch(`/messages/${userId}`).catch(() =>[]);
-                const history = document.getElementById('chat-history');
-                history.innerHTML = '';
-                msgs.forEach(m => {
-                    const bubble = document.createElement('div');
-                    const isMine = m.SenderId === currentUser.id;
-                    bubble.className = `chat-bubble ${isMine ? 'chat-mine' : 'chat-theirs'}`;
-                    bubble.textContent = m.MessageText;
-                    history.appendChild(bubble);
-                });
-                history.scrollTop = history.scrollHeight;
-            } catch(e) {}
-        }
-
-        // PROFILE
-        function buildProfile() {
-            const container = document.getElementById('view-profile');
-            container.innerHTML = '';
-            
-            const card = new ECBasicCard();
-            card.element.classList.add('display-flex', 'flexDirection-column', 'alignItems-center', 'textAlign-center');
-            
-            card.append(new ECAvatar({ initials: currentUser.name.charAt(0), size: "80px" }).element);
-            card.append(`<h2 class="margin-10px_0_5px">${currentUser.name}</h2>`);
-            card.append(`<p class="color-var(--ec-text-muted) margin-0_0_20px">Member of Oogway</p>`);
-
-            const editModal = new ECModal("Edit Profile");
-            const bioInput = new ECTextbox({ label: "Bio" });
-            editModal.addContent(bioInput.element);
-            editModal.addFooterButton("Save", () => {
-                new ECToast("Profile updated!", {type: 'success'}).show();
-                editModal.close();
-            });
-            document.body.appendChild(editModal.element);
-
-            card.append(new ECButton("Edit Profile", {variant: "outline"}).onClick(() => editModal.open()).element);
-            
-            container.appendChild(card.element);
-        }
-
-        // SETTINGS (Expanded Theme Picker)
-        function buildSettings() {
-            const container = document.getElementById('view-settings');
-            container.innerHTML = '';
-
-            const card = new ECBasicCard();
-            card.append("<h2>Settings</h2>");
-            card.append(new ECDivider().element);
-            card.append("<h3>Theme Settings</h3>");
-
-            // Dark Mode Toggle
-            const modeToggle = new ECToggle("Dark Mode", currentUser.themeMode === 'dark').onChange(async (isDark) => {
-                const mode = isDark ? 'dark' : 'light';
-                currentUser.themeMode = mode;
-                localStorage.setItem('user', JSON.stringify(currentUser));
-                applyThemeSettings(mode, currentUser.themeColor || 'blue');
-                await apiFetch('/settings/theme', { method: 'PUT', body: { theme: mode, color: currentUser.themeColor } }).catch(()=>{});
-            });
-            card.append(modeToggle.element);
-            card.append("<br><br>");
-
-            // Color Scheme Picker
-            card.append("<p class='fontSize-14px fontWeight-500 margin-0_0_10px'>Accent Color Scheme</p>");
-            const colorOptions =[
-                { label: "Oogway Blue", value: "blue", checked: currentUser.themeColor === 'blue' },
-                { label: "Turtle Green", value: "green", checked: currentUser.themeColor === 'green' },
-                { label: "Dragon Red", value: "red", checked: currentUser.themeColor === 'red' },
-                { label: "Mystic Purple", value: "purple", checked: currentUser.themeColor === 'purple' },
-                { label: "Tiger Orange", value: "orange", checked: currentUser.themeColor === 'orange' }
-            ];
-            
-            const colorRadio = new ECRadio("color-scheme", colorOptions).onChange(async (val) => {
-                currentUser.themeColor = val;
-                localStorage.setItem('user', JSON.stringify(currentUser));
-                applyThemeSettings(currentUser.themeMode || 'light', val);
-                await apiFetch('/settings/theme', { method: 'PUT', body: { theme: currentUser.themeMode, color: val } }).catch(()=>{});
-            });
-
-            card.append(colorRadio.element);
-
-            container.appendChild(card.element);
-        }
-
-        // Boot
-        document.addEventListener("DOMContentLoaded", initApp);
-    </script>
+  // Enter key support
+  ["login-username","login-password"].forEach(id => {
+    document.getElementById(id).addEventListener("keydown", e => { if(e.key === "Enter") document.getElementById("login-btn").click(); });
+  });
+})();
+</script>
 </body>
 </html>
