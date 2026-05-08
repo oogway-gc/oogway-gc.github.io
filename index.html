@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOGWAY</title>
+    <!-- Light & Dark Mode Variable Definitions -->
+    <style>
+        :root {
+            --bg-main: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-main: #050505;
+            --text-sec: #65676B;
+            --border: #ced0d4;
+            --primary: #1877f2;
+            --primary-hover: #166fe5;
+        }
+        body.dark {
+            --bg-main: #18191a;
+            --bg-card: #242526;
+            --text-main: #e4e6eb;
+            --text-sec: #b0b3b8;
+            --border: #3e4042;
+            --primary: #2d88ff;
+            --primary-hover: #1877f2;
+        }
+        body { margin: 0; padding: 0; overflow: hidden; transition: 0.3s background; }
+        
+        /* Hide scrollbars for cleaner UI but allow scrolling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    </style>
+    <script src="https://isaiahnoelpulidosalazar.github.io/js/ECStyleSheet.js"></script>
+</head>
+<body class="backgroundColor-var(--bg-main) color-var(--text-main)">
+
+    <!-- Authentication View -->
+    <div id="auth-view" class="display-flex justifyContent-center alignItems-center height-100vh">
+        <div class="eccard padding-30px width-400px backgroundColor-var(--bg-card)">
+            <h1 class="textAlign-center color-var(--primary) margin-0_0_20px_0">OOGWAY</h1>
+            
+            <form id="login-form" class="display-flex flexDirection-column gap-15px">
+                <input type="text" id="l-user" placeholder="Username" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
+                <input type="password" id="l-pass" placeholder="Password" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
+                <button type="submit" class="padding-10px backgroundColor-var(--primary) color-white border-none borderRadius-5px cursor-pointer ecbounce-5">Login</button>
+                <p class="textAlign-center fontSize-14px cursor-pointer color-var(--text-sec) hover:color-var(--primary)" onclick="toggleAuth()">Don't have an account? Register</p>
+            </form>
+
+            <form id="register-form" class="display-none flexDirection-column gap-15px">
+                <input type="text" id="r-fn" placeholder="First Name" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
+                <input type="text" id="r-ln" placeholder="Last Name" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
+                <input type="text" id="r-user" placeholder="Desired Username" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
+                <input type="password" id="r-pass" placeholder="Password" class="padding-10px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)" required>
+                <button type="submit" class="padding-10px backgroundColor-#28a745 color-white border-none borderRadius-5px cursor-pointer ecbounce-5">Register</button>
+                <p class="textAlign-center fontSize-14px cursor-pointer color-var(--text-sec) hover:color-var(--primary)" onclick="toggleAuth()">Already have an account? Login</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App View -->
+    <div id="app-view" class="display-none width-100vw height-100vh display-flex">
+        
+        <!-- Sidebar -->
+        <div class="width-250px backgroundColor-var(--bg-card) borderRight-1px_solid_var(--border) display-flex flexDirection-column mobile:display-none">
+            <h2 class="padding-20px color-var(--primary) margin-0 borderBottom-1px_solid_var(--border)">OOGWAY</h2>
+            <nav class="display-flex flexDirection-column padding-15px gap-10px flex-1">
+                <button onclick="switchTab('home')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">🏠 Home Feed</button>
+                <button onclick="switchTab('activities')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">📅 Activities Tracker</button>
+                <button onclick="switchTab('games')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">🎮 Mini Games</button>
+                <button onclick="switchTab('messages')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">💬 Messages</button>
+                <button onclick="switchTab('profile')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">👤 Profile</button>
+                <button onclick="switchTab('settings')" class="textAlign-left padding-10px backgroundColor-transparent border-none fontSize-16px cursor-pointer borderRadius-5px color-var(--text-main) hover:backgroundColor-var(--bg-main) ecbounce-2">⚙️ Settings</button>
+            </nav>
+        </div>
+
+        <!-- Main Area -->
+        <div class="flex-1 display-flex flexDirection-column overflow-hidden">
+            
+            <!-- Topbar -->
+            <div class="height-60px backgroundColor-var(--bg-card) borderBottom-1px_solid_var(--border) display-flex justifyContent-space-between alignItems-center padding-0_20px">
+                <div class="display-flex alignItems-center gap-10px">
+                    <div class="width-35px height-35px borderRadius-50% backgroundColor-var(--primary) color-white display-flex justifyContent-center alignItems-center">U</div>
+                    <span id="topbar-user" class="fontWeight-bold">User Name</span>
+                </div>
+                <div class="display-flex gap-15px">
+                    <button class="backgroundColor-var(--bg-main) border-none padding-8px_15px borderRadius-20px cursor-pointer color-var(--text-main) ecbounce-5">🔔 Notifs</button>
+                    <button onclick="logout()" class="backgroundColor-#dc3545 color-white border-none padding-8px_15px borderRadius-20px cursor-pointer ecbounce-5">Log Out</button>
+                </div>
+            </div>
+
+            <!-- Content Views -->
+            <div class="flex-1 overflowY-auto padding-20px position-relative display-flex justifyContent-center">
+                
+                <!-- Home / Social Feed -->
+                <div id="view-home" class="width-100% maxWidth-600px display-flex flexDirection-column gap-20px">
+                    
+                    <!-- Create Post -->
+                    <div class="eccard padding-15px backgroundColor-var(--bg-card)">
+                        <textarea id="post-text" placeholder="What's on your mind, Oogway master?" class="width-100% minHeight-80px border-none backgroundColor-transparent color-var(--text-main) fontSize-16px resize-none outline-none"></textarea>
+                        <div class="display-flex justifyContent-space-between alignItems-center marginTop-10px borderTop-1px_solid_var(--border) paddingTop-10px">
+                            <input type="file" id="post-img" class="color-var(--text-sec) fontSize-12px">
+                            <button onclick="createPost()" class="backgroundColor-var(--primary) color-white border-none padding-8px_20px borderRadius-5px cursor-pointer ecbounce-5">Post</button>
+                        </div>
+                    </div>
+
+                    <!-- Feed Container -->
+                    <div id="feed-container" class="display-flex flexDirection-column gap-15px">
+                        <!-- Post templates go here dynamically -->
+                        <div class="eccard padding-15px backgroundColor-var(--bg-card)">
+                            <div class="display-flex alignItems-center gap-10px marginBottom-10px">
+                                <b>Master Shifu</b> <span class="color-var(--text-sec) fontSize-12px">2 hrs ago</span>
+                            </div>
+                            <p class="margin-0">Welcome to OOGWAY social media! "There are no accidents."</p>
+                        </div>
+                    </div>
+
+                    <!-- Find Users to Follow -->
+                    <div class="eccard padding-15px backgroundColor-var(--bg-card) marginTop-20px">
+                        <h3 class="margin-0_0_15px_0">Find Users</h3>
+                        <div class="display-flex justifyContent-space-between alignItems-center borderBottom-1px_solid_var(--border) paddingBottom-10px">
+                            <span>Po The Panda</span>
+                            <button class="backgroundColor-var(--primary) color-white border-none padding-5px_10px borderRadius-5px cursor-pointer">Follow</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activities / Calendar -->
+                <div id="view-activities" class="display-none width-100% maxWidth-800px flexDirection-column gap-20px">
+                    <div class="display-flex justifyContent-space-between alignItems-center">
+                        <h2>Schedule Tracker</h2>
+                        <button class="backgroundColor-var(--primary) color-white border-none padding-10px_20px borderRadius-5px cursor-pointer">+ Add Event</button>
+                    </div>
+                    <!-- Calendar Grid (7 columns using ecgrid) -->
+                    <div class="ecgrid-7x5 gap-10px">
+                        <!-- Mon - Sun Headers -->
+                        <div class="textAlign-center fontWeight-bold">Mon</div><div class="textAlign-center fontWeight-bold">Tue</div>
+                        <div class="textAlign-center fontWeight-bold">Wed</div><div class="textAlign-center fontWeight-bold">Thu</div>
+                        <div class="textAlign-center fontWeight-bold">Fri</div><div class="textAlign-center fontWeight-bold">Sat</div>
+                        <div class="textAlign-center fontWeight-bold">Sun</div>
+                        <!-- Mock Days -->
+                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)">
+                            <span class="fontSize-12px">1</span>
+                            <div class="backgroundColor-#28a745 color-white fontSize-10px padding-2px borderRadius-3px marginTop-5px">Meeting</div>
+                        </div>
+                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">2</span></div>
+                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">3</span></div>
+                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">4</span></div>
+                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)">
+                            <span class="fontSize-12px">5</span>
+                            <div class="backgroundColor-var(--primary) color-white fontSize-10px padding-2px borderRadius-3px marginTop-5px">Gaming</div>
+                        </div>
+                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">6</span></div>
+                        <div class="minHeight-80px border-1px_solid_var(--border) padding-5px backgroundColor-var(--bg-card)"><span class="fontSize-12px">7</span></div>
+                    </div>
+                </div>
+
+                <!-- Mini Games Section -->
+                <div id="view-games" class="display-none width-100% maxWidth-800px flexDirection-column gap-20px">
+                    <h2>Mini Games Area</h2>
+                    <p class="color-var(--text-sec)">Pure HTML/CSS/JS games can be hosted within iframes below.</p>
+                    <div class="ecgrid-2x2 gap-20px">
+                        <div class="eccard padding-20px backgroundColor-var(--bg-card) display-flex flexDirection-column alignItems-center">
+                            <div class="width-100% height-150px backgroundColor-var(--bg-main) marginBottom-15px display-flex justifyContent-center alignItems-center">👾</div>
+                            <button class="width-100% backgroundColor-var(--primary) color-white border-none padding-10px borderRadius-5px cursor-pointer ecbounce-5">Play Snake</button>
+                        </div>
+                        <div class="eccard padding-20px backgroundColor-var(--bg-card) display-flex flexDirection-column alignItems-center">
+                            <div class="width-100% height-150px backgroundColor-var(--bg-main) marginBottom-15px display-flex justifyContent-center alignItems-center">⭕❌</div>
+                            <button class="width-100% backgroundColor-var(--primary) color-white border-none padding-10px borderRadius-5px cursor-pointer ecbounce-5">Play TicTacToe</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div id="view-messages" class="display-none width-100% maxWidth-800px height-100% flexDirection-row gap-15px">
+                    <div class="width-200px eccard backgroundColor-var(--bg-card) padding-10px overflowY-auto">
+                        <h4 class="margin-0_0_10px_0">Chats</h4>
+                        <div class="padding-10px backgroundColor-var(--bg-main) borderRadius-5px cursor-pointer marginBottom-5px">Master Shifu</div>
+                        <div class="padding-10px hover:backgroundColor-var(--bg-main) borderRadius-5px cursor-pointer">Po</div>
+                    </div>
+                    <div class="flex-1 eccard backgroundColor-var(--bg-card) display-flex flexDirection-column">
+                        <div class="padding-15px borderBottom-1px_solid_var(--border) fontWeight-bold">Master Shifu</div>
+                        <div class="flex-1 padding-15px overflowY-auto display-flex flexDirection-column gap-10px">
+                            <div class="alignSelf-flex-start backgroundColor-var(--bg-main) padding-10px borderRadius-10px">Hello! Did you finish training?</div>
+                            <div class="alignSelf-flex-end backgroundColor-var(--primary) color-white padding-10px borderRadius-10px">Yes Master.</div>
+                        </div>
+                        <div class="padding-10px borderTop-1px_solid_var(--border) display-flex gap-10px">
+                            <input type="text" class="flex-1 border-1px_solid_var(--border) borderRadius-20px padding-0_15px backgroundColor-var(--bg-main) color-var(--text-main)" placeholder="Type a message...">
+                            <button class="backgroundColor-var(--primary) color-white border-none padding-10px_15px borderRadius-20px cursor-pointer">Send</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile -->
+                <div id="view-profile" class="display-none width-100% maxWidth-600px flexDirection-column gap-20px">
+                    <div class="eccard padding-30px backgroundColor-var(--bg-card) display-flex flexDirection-column alignItems-center">
+                        <div class="width-100px height-100px borderRadius-50% backgroundColor-var(--primary) color-white display-flex justifyContent-center alignItems-center fontSize-40px marginBottom-15px">U</div>
+                        <h2 id="prof-name" class="margin-0">User Name</h2>
+                        <p class="color-var(--text-sec)">Joined 2026</p>
+                        <button class="border-1px_solid_var(--border) backgroundColor-transparent padding-8px_15px borderRadius-5px cursor-pointer color-var(--text-main)">Edit Profile</button>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div id="view-settings" class="display-none width-100% maxWidth-600px flexDirection-column gap-20px">
+                    <div class="eccard padding-20px backgroundColor-var(--bg-card)">
+                        <h2>Settings</h2>
+                        <div class="display-flex justifyContent-space-between alignItems-center padding-10px_0 borderBottom-1px_solid_var(--border)">
+                            <span>Theme Mode</span>
+                            <select id="theme-selector" onchange="changeTheme(this.value)" class="padding-5px border-1px_solid_var(--border) borderRadius-5px backgroundColor-var(--bg-main) color-var(--text-main)">
+                                <option value="light">Light Mode</option>
+                                <option value="dark">Dark Mode</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <script>
+        let currentUser = null;
+        const apiBase = 'https://oogway-gc-api.vercel.app/';
+
+        // Helper toggles Auth screen
+        function toggleAuth() {
+            const login = document.getElementById('login-form');
+            const reg = document.getElementById('register-form');
+            if (login.classList.contains('display-none')) {
+                login.classList.remove('display-none');
+                login.classList.add('display-flex');
+                reg.classList.add('display-none');
+                reg.classList.remove('display-flex');
+            } else {
+                login.classList.add('display-none');
+                login.classList.remove('display-flex');
+                reg.classList.remove('display-none');
+                reg.classList.add('display-flex');
+            }
+        }
+
+        // Tab Switcher
+        function switchTab(tabId) {
+            const views = document.querySelectorAll('[id^="view-"]');
+            views.forEach(v => {
+                v.classList.remove('display-flex');
+                v.classList.add('display-none');
+            });
+            const target = document.getElementById(`view-${tabId}`);
+            target.classList.remove('display-none');
+            target.classList.add('display-flex');
+        }
+
+        // Apply theme 
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+            document.getElementById('theme-selector').value = theme;
+        }
+
+        function changeTheme(theme) {
+            applyTheme(theme);
+            const token = localStorage.getItem('token');
+            if(token) {
+                // Async save to DB
+                fetch(`${apiBase}/settings/theme`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                    body: JSON.stringify({ theme })
+                });
+            }
+        }
+
+        // Login Logic
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('l-user').value;
+            const password = document.getElementById('l-pass').value;
+            
+            const res = await fetch(`${apiBase}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                localStorage.setItem('token', data.token);
+                currentUser = data.user;
+                
+                applyTheme(data.theme);
+                document.getElementById('topbar-user').innerText = currentUser.name;
+                document.getElementById('prof-name').innerText = currentUser.name;
+
+                document.getElementById('auth-view').classList.add('display-none');
+                document.getElementById('app-view').classList.remove('display-none');
+            } else {
+                const err = await res.json();
+                alert(err.error);
+            }
+        });
+
+        // Register Logic
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = {
+                firstName: document.getElementById('r-fn').value,
+                lastName: document.getElementById('r-ln').value,
+                username: document.getElementById('r-user').value,
+                password: document.getElementById('r-pass').value,
+            };
+
+            const res = await fetch(`${apiBase}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (res.ok) {
+                alert('Success! Please login.');
+                toggleAuth();
+            } else {
+                const err = await res.json();
+                alert(err.error);
+            }
+        });
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            currentUser = null;
+            document.getElementById('app-view').classList.add('display-none');
+            document.getElementById('auth-view').classList.remove('display-none');
+        }
+
+        // Post creation (Uses Multi-part form-data for Images)
+        async function createPost() {
+            const text = document.getElementById('post-text').value;
+            const file = document.getElementById('post-img').files[0];
+            const token = localStorage.getItem('token');
+
+            if (!text && !file) return alert('Post cannot be empty!');
+
+            const formData = new FormData();
+            formData.append('content', text);
+            if (file) formData.append('image', file);
+
+            const res = await fetch(`${apiBase}/posts`, {
+                method: 'POST',
+                headers: { 'Authorization': token },
+                body: formData
+            });
+
+            if(res.ok) {
+                document.getElementById('post-text').value = '';
+                document.getElementById('post-img').value = '';
+                alert('Posted successfully!');
+            }
+        }
+    </script>
+</body>
+</html>
